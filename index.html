@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetVision Pro - C++ Network Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon"></div>
+                <h2>NetVision Pro</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-view="dashboard" data-i18n="nav_dashboard">Dashboard</a>
+                <a href="#" class="nav-item" data-view="map" data-i18n="nav_map">Geo Map</a>
+                <a href="#" class="nav-item" data-view="alerts" data-i18n="nav_alerts">Alerts <span class="badge" id="alert-badge">0</span></a>
+                <a href="#" class="nav-item" data-view="logs" data-i18n="nav_logs">System Logs</a>
+                <a href="#" class="nav-item" data-view="settings" data-i18n="nav_settings">Settings</a>
+            </nav>
+
+            <div class="engine-control">
+                <div class="status-indicator">
+                    <div class="status-dot" id="engine-status-dot"></div>
+                    <span id="engine-status-text">Engine Stopped</span>
+                </div>
+                <button id="toggle-engine-btn" data-i18n="btn_start">Start Capture</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Ambient Glows -->
+            <div class="ambient-glow glow-blue"></div>
+            <div class="ambient-glow glow-green"></div>
+            <div class="ambient-glow glow-red" id="alert-glow"></div>
+
+            <header class="topbar">
+                <h1 id="view-title" data-i18n="nav_dashboard">Dashboard</h1>
+                <div class="topbar-controls">
+                    <select id="language-selector" class="lang-select">
+                        <option value="en">English</option>
+                        <option value="tr">Türkçe</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="content-area">
+                
+                <!-- Dashboard View -->
+                <div id="view-dashboard" class="view active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 data-i18n="stat_packets">Captured Packets</h3>
+                            <div class="stat-value" id="val-packets">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="stat_bandwidth">Bandwidth (Mbps)</h3>
+                            <div class="stat-value" id="val-bandwidth">0.0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="stat_active">Active IPs</h3>
+                            <div class="stat-value" id="val-active-ips">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="stat_dropped">Dropped (Anomalies)</h3>
+                            <div class="stat-value text-red" id="val-dropped">0</div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panels">
+                        <div class="panel">
+                            <h3 data-i18n="panel_top_ips">Top Active IPs</h3>
+                            <div class="table-container">
+                                <table id="top-ips-table">
+                                    <thead>
+                                        <tr>
+                                            <th>IP Address</th>
+                                            <th>Bytes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <h3 data-i18n="panel_tls">TLS Domains</h3>
+                            <div class="table-container">
+                                <table id="tls-domains-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Domain</th>
+                                            <th>Hits</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map View -->
+                <div id="view-map" class="view hidden">
+                    <div class="panel h-full flex-center">
+                        <h2 data-i18n="map_placeholder">Live Geo-Location Tracking Active...</h2>
+                        <p class="text-muted" data-i18n="map_desc">C++ GeoIPLite database is simulating connections across the globe.</p>
+                        <div class="radar-animation"></div>
+                    </div>
+                </div>
+
+                <!-- Alerts View -->
+                <div id="view-alerts" class="view hidden">
+                    <div class="panel">
+                        <h3 data-i18n="panel_alerts">Security Alerts</h3>
+                        <div id="alerts-container" class="alerts-list">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs View -->
+                <div id="view-logs" class="view hidden">
+                    <div class="panel terminal-panel">
+                        <div class="terminal-header">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                            <span class="terminal-title">netvision-daemon.log</span>
+                        </div>
+                        <div class="terminal-content" id="logs-container">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings View -->
+                <div id="view-settings" class="view hidden">
+                    <div class="panel max-w-md mx-auto">
+                        <h3 data-i18n="settings_title">Daemon Configuration</h3>
+                        <p class="text-muted mb-4" data-i18n="settings_desc">Configure the C++ backend daemon parameters.</p>
+                        
+                        <div class="form-group">
+                            <label data-i18n="lbl_interface">Network Interface</label>
+                            <input type="text" value="eth0" class="input-field" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label data-i18n="lbl_bpf">BPF Filter</label>
+                            <input type="text" value="ip and not host 10.0.0.5" class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label data-i18n="lbl_loglevel">Log Level</label>
+                            <select class="input-field">
+                                <option>DEBUG</option>
+                                <option selected>INFO</option>
+                                <option>WARN</option>
+                                <option>ERROR</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary mt-4" onclick="alert('Configuration saved directly to daemon.')" data-i18n="btn_save">Save Config</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
