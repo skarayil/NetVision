@@ -1,6 +1,6 @@
-# NetVision Pro - Network Monitor
+# NetVision - Network Monitor
 
-NetVision Pro is a high-performance network monitoring and packet analysis tool, built with a robust **C++ backend daemon** and a dynamic, **colorful dark-theme web interface**.
+NetVision is a high-performance network monitoring and packet analysis tool, built with a robust **C++ backend daemon** and a dynamic, **colorful dark-theme web interface**.
 
 ## Features
 

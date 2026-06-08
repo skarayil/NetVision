@@ -3,79 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetVision Pro - C++ Network Analyzer</title>
+    <title>NetVision - C++ Network Analyzer</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-icon"></div>
-                <h2>NetVision Pro</h2>
+        
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <div class="nav-left">
+                <img src="logo.png" class="logo-img" alt="NetVision Logo">
+                <h2>NetVision</h2>
             </div>
             
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-view="dashboard" data-i18n="nav_dashboard">Dashboard</a>
                 <a href="#" class="nav-item" data-view="map" data-i18n="nav_map">Geo Map</a>
+                <a href="#" class="nav-item" data-view="rules" data-i18n="nav_rules">Rules</a>
+                <a href="#" class="nav-item" data-view="export" data-i18n="nav_export">Export</a>
                 <a href="#" class="nav-item" data-view="alerts" data-i18n="nav_alerts">Alerts <span class="badge" id="alert-badge">0</span></a>
                 <a href="#" class="nav-item" data-view="logs" data-i18n="nav_logs">System Logs</a>
+                <a href="#" class="nav-item" data-view="architecture" data-i18n="nav_arch">Architecture</a>
                 <a href="#" class="nav-item" data-view="settings" data-i18n="nav_settings">Settings</a>
             </nav>
 
-            <div class="engine-control">
+            <div class="nav-right">
                 <div class="status-indicator">
                     <div class="status-dot" id="engine-status-dot"></div>
                     <span id="engine-status-text">Engine Stopped</span>
                 </div>
-                <button id="toggle-engine-btn" data-i18n="btn_start">Start Capture</button>
+                <button id="toggle-engine-btn" class="btn-action" data-i18n="btn_start">Start Capture</button>
+                <select id="language-selector" class="lang-select">
+                    <option value="en">English</option>
+                    <option value="tr">Türkçe</option>
+                </select>
             </div>
-        </aside>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Ambient Glows -->
-            <div class="ambient-glow glow-blue"></div>
-            <div class="ambient-glow glow-green"></div>
-            <div class="ambient-glow glow-red" id="alert-glow"></div>
+            <!-- Glassmorphism Background Gradients -->
+            <div class="bg-gradient bg-grad-1"></div>
+            <div class="bg-gradient bg-grad-2"></div>
+            <div class="bg-gradient bg-grad-3" id="alert-glow"></div>
 
-            <header class="topbar">
+            <div class="content-header">
                 <h1 id="view-title" data-i18n="nav_dashboard">Dashboard</h1>
-                <div class="topbar-controls">
-                    <select id="language-selector" class="lang-select">
-                        <option value="en">English</option>
-                        <option value="tr">Türkçe</option>
-                    </select>
-                </div>
-            </header>
+            </div>
 
             <div class="content-area">
                 
                 <!-- Dashboard View -->
                 <div id="view-dashboard" class="view active">
                     <div class="stats-grid">
-                        <div class="stat-card">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon icon-blue"></div>
                             <h3 data-i18n="stat_packets">Captured Packets</h3>
                             <div class="stat-value" id="val-packets">0</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon icon-purple"></div>
                             <h3 data-i18n="stat_bandwidth">Bandwidth (Mbps)</h3>
                             <div class="stat-value" id="val-bandwidth">0.0</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon icon-green"></div>
                             <h3 data-i18n="stat_active">Active IPs</h3>
                             <div class="stat-value" id="val-active-ips">0</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-panel alert-card">
+                            <div class="stat-icon icon-red"></div>
                             <h3 data-i18n="stat_dropped">Dropped (Anomalies)</h3>
                             <div class="stat-value text-red" id="val-dropped">0</div>
                         </div>
                     </div>
 
                     <div class="dashboard-panels">
-                        <div class="panel">
-                            <h3 data-i18n="panel_top_ips">Top Active IPs</h3>
+                        <div class="glass-panel">
+                            <h3 data-i18n="panel_top_ips" class="panel-title">Top Active IPs</h3>
                             <div class="table-container">
                                 <table id="top-ips-table">
                                     <thead>
@@ -90,8 +96,8 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="panel">
-                            <h3 data-i18n="panel_tls">TLS Domains</h3>
+                        <div class="glass-panel">
+                            <h3 data-i18n="panel_tls" class="panel-title">TLS Domains</h3>
                             <div class="table-container">
                                 <table id="tls-domains-table">
                                     <thead>
@@ -111,17 +117,98 @@
 
                 <!-- Map View -->
                 <div id="view-map" class="view hidden">
-                    <div class="panel h-full flex-center">
-                        <h2 data-i18n="map_placeholder">Live Geo-Location Tracking Active...</h2>
-                        <p class="text-muted" data-i18n="map_desc">C++ GeoIPLite database is simulating connections across the globe.</p>
-                        <div class="radar-animation"></div>
+                    <div class="glass-panel h-full flex-center relative overflow-hidden">
+                        <div class="world-map-bg"></div>
+                        <h2 data-i18n="map_placeholder" class="z-10 text-2xl font-semibold mb-2">Live Geo-Location Tracking Active...</h2>
+                        <p class="text-muted z-10" data-i18n="map_desc">C++ GeoIPLite database is simulating connections across the globe.</p>
+                        <div class="radar-animation z-10"></div>
+                    </div>
+                </div>
+
+                <!-- Rules Manager View -->
+                <div id="view-rules" class="view hidden">
+                    <div class="dashboard-panels">
+                        <div class="glass-panel">
+                            <h3 data-i18n="rules_add_title" class="panel-title">Add Custom Rule</h3>
+                            <div class="form-group">
+                                <label data-i18n="lbl_rule_name">Rule Name</label>
+                                <input type="text" id="rule-name" class="input-field" placeholder="e.g. Block Port 22">
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="lbl_rule_condition">Condition (BPF syntax)</label>
+                                <input type="text" id="rule-condition" class="input-field" placeholder="e.g. tcp dst port 22">
+                            </div>
+                            <button class="btn-primary" onclick="addRule()" data-i18n="btn_add_rule">Add Rule</button>
+                        </div>
+                        <div class="glass-panel">
+                            <h3 data-i18n="rules_active_title" class="panel-title">Active Rules</h3>
+                            <div class="table-container">
+                                <table id="rules-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Condition</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rules-tbody">
+                                        <tr>
+                                            <td>Default Block</td>
+                                            <td class="font-mono">ip and not host 10.0.0.5</td>
+                                            <td><button class="btn-delete" disabled>Locked</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Manager View -->
+                <div id="view-export" class="view hidden">
+                    <div class="glass-panel max-w-md mx-auto">
+                        <h3 data-i18n="export_title" class="panel-title">Export PCAP & Metrics</h3>
+                        <p class="text-muted mb-6" data-i18n="export_desc">Download captured packets and statistical data for offline analysis.</p>
+                        
+                        <div class="export-options">
+                            <button class="btn-primary w-full mb-4 export-btn" onclick="simulateExport(this)" data-i18n="btn_export_pcap">Export as .PCAP</button>
+                            <button class="btn-secondary w-full mb-4 export-btn" onclick="simulateExport(this)" data-i18n="btn_export_csv">Export Metrics (CSV)</button>
+                            <button class="btn-secondary w-full export-btn" onclick="simulateExport(this)" data-i18n="btn_export_json">Export Data (JSON)</button>
+                        </div>
+                        <div class="export-progress hidden mt-6" id="export-progress">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="export-fill"></div>
+                            </div>
+                            <p class="text-center mt-2 text-sm text-muted" id="export-status">Exporting...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Architecture Guide View -->
+                <div id="view-architecture" class="view hidden">
+                    <div class="glass-panel">
+                        <h3 data-i18n="arch_title" class="panel-title">System Architecture</h3>
+                        <p class="text-muted mb-6" data-i18n="arch_desc">A high-level overview of the NetVision C++ components and data flow.</p>
+                        
+                        <div class="arch-diagram">
+                            <div class="arch-box">Network Interface (eth0)</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-box highlight">PacketParser.cpp (BPF Filtering)</div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-flex">
+                                <div class="arch-box">GeoIPLite.cpp</div>
+                                <div class="arch-box">NetworkAnalyzer.cpp</div>
+                            </div>
+                            <div class="arch-arrow">↓</div>
+                            <div class="arch-box highlight">Vanilla JS Frontend (WebSocket Simulation)</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Alerts View -->
                 <div id="view-alerts" class="view hidden">
-                    <div class="panel">
-                        <h3 data-i18n="panel_alerts">Security Alerts</h3>
+                    <div class="glass-panel">
+                        <h3 data-i18n="panel_alerts" class="panel-title">Security Alerts</h3>
                         <div id="alerts-container" class="alerts-list">
                             <!-- Populated via JS -->
                         </div>
@@ -130,7 +217,7 @@
 
                 <!-- Logs View -->
                 <div id="view-logs" class="view hidden">
-                    <div class="panel terminal-panel">
+                    <div class="glass-panel terminal-panel">
                         <div class="terminal-header">
                             <span class="dot red"></span>
                             <span class="dot yellow"></span>
@@ -145,9 +232,9 @@
 
                 <!-- Settings View -->
                 <div id="view-settings" class="view hidden">
-                    <div class="panel max-w-md mx-auto">
-                        <h3 data-i18n="settings_title">Daemon Configuration</h3>
-                        <p class="text-muted mb-4" data-i18n="settings_desc">Configure the C++ backend daemon parameters.</p>
+                    <div class="glass-panel max-w-md mx-auto">
+                        <h3 data-i18n="settings_title" class="panel-title">Daemon Configuration</h3>
+                        <p class="text-muted mb-6" data-i18n="settings_desc">Configure the C++ backend daemon parameters.</p>
                         
                         <div class="form-group">
                             <label data-i18n="lbl_interface">Network Interface</label>
@@ -169,12 +256,30 @@
                             </select>
                         </div>
 
-                        <button class="btn btn-primary mt-4" onclick="alert('Configuration saved directly to daemon.')" data-i18n="btn_save">Save Config</button>
+                        <button class="btn-primary mt-6 w-full" onclick="alert('Configuration saved directly to daemon.')" data-i18n="btn_save">Save Config</button>
                     </div>
                 </div>
 
             </div>
         </main>
+
+        <!-- Playback Bar -->
+        <footer class="playback-bar">
+            <div class="playback-controls">
+                <button class="playback-btn" id="pb-rewind">⏮</button>
+                <button class="playback-btn" id="pb-play">⏸</button>
+                <button class="playback-btn" id="pb-forward">⏭</button>
+            </div>
+            <div class="timeline-container">
+                <span class="timeline-time" id="time-start">10:00:00</span>
+                <input type="range" class="timeline-slider" id="timeline-slider" value="100" min="0" max="100">
+                <span class="timeline-time" id="time-current">Live</span>
+            </div>
+            <div class="playback-status">
+                <span data-i18n="pb_live" class="live-badge">LIVE</span>
+            </div>
+        </footer>
+
     </div>
     <script src="app.js"></script>
 </body>
