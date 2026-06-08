@@ -1,39 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetVision - C++ Network Analyzer</title>
+    <title>NetVision - Enterprise Network Monitoring & Management Platform</title>
+    <!-- Relative css path -->
     <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
         
-        <!-- Top Navigation Bar -->
+        <!-- Fixed-Top Navigation Bar -->
         <header class="top-nav">
             <div class="nav-left">
-                <img src="logo.png" class="logo-img" alt="NetVision Logo">
-                <h2>NetVision</h2>
+                <div class="logo-container">
+                    <i class="fa-solid fa-circle-nodes logo-icon"></i>
+                    <h2>NetVision</h2>
+                </div>
             </div>
             
             <nav class="nav-menu">
-                <a href="#" class="nav-item active" data-view="dashboard" data-i18n="nav_dashboard">Dashboard</a>
-                <a href="#" class="nav-item" data-view="map" data-i18n="nav_map">Geo Map</a>
-                <a href="#" class="nav-item" data-view="rules" data-i18n="nav_rules">Rules</a>
-                <a href="#" class="nav-item" data-view="export" data-i18n="nav_export">Export</a>
-                <a href="#" class="nav-item" data-view="alerts" data-i18n="nav_alerts">Alerts <span class="badge" id="alert-badge">0</span></a>
-                <a href="#" class="nav-item" data-view="logs" data-i18n="nav_logs">System Logs</a>
-                <a href="#" class="nav-item" data-view="architecture" data-i18n="nav_arch">Architecture</a>
-                <a href="#" class="nav-item" data-view="settings" data-i18n="nav_settings">Settings</a>
+                <a href="#" class="nav-item active" data-view="dashboard" data-i18n="nav_dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="#" class="nav-item" data-view="map" data-i18n="nav_map"><i class="fa-solid fa-network-wired"></i> Network Map</a>
+                <a href="#" class="nav-item" data-view="monitoring" data-i18n="nav_monitoring"><i class="fa-solid fa-desktop"></i> Monitoring</a>
+                <a href="#" class="nav-item" data-view="security" data-i18n="nav_security"><i class="fa-solid fa-shield-halved"></i> Security Center</a>
+                <a href="#" class="nav-item" data-view="analytics" data-i18n="nav_analytics"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+                <a href="#" class="nav-item" data-view="reports" data-i18n="nav_reports"><i class="fa-solid fa-file-invoice"></i> Reports</a>
+                <a href="#" class="nav-item" data-view="ai-assistant" data-i18n="nav_ai"><i class="fa-solid fa-brain"></i> AI Assistant</a>
+                <a href="#" class="nav-item" data-view="users" data-i18n="nav_users"><i class="fa-solid fa-users-gear"></i> Users</a>
+                <a href="#" class="nav-item" data-view="settings" data-i18n="nav_settings"><i class="fa-solid fa-sliders"></i> Settings</a>
             </nav>
 
             <div class="nav-right">
+                <div class="connection-status badge-info" id="connection-mode-badge">
+                    <i class="fa-solid fa-wifi"></i> <span id="connection-mode-text">Simulation Mode</span>
+                </div>
                 <div class="status-indicator">
                     <div class="status-dot" id="engine-status-dot"></div>
                     <span id="engine-status-text">Engine Stopped</span>
                 </div>
                 <button id="toggle-engine-btn" class="btn-action" data-i18n="btn_start">Start Capture</button>
+                
+                <!-- Quick controls -->
+                <button id="theme-toggle" class="btn-icon" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
                 <select id="language-selector" class="lang-select">
                     <option value="en">English</option>
                     <option value="tr">Türkçe</option>
@@ -41,234 +58,771 @@
             </div>
         </header>
 
-        <!-- Main Content -->
+        <!-- Main Content Layout -->
         <main class="main-content">
-            <!-- Glassmorphism Background Gradients -->
+            <!-- Glassmorphism Animated Ambient Lights -->
             <div class="bg-gradient bg-grad-1"></div>
             <div class="bg-gradient bg-grad-2"></div>
             <div class="bg-gradient bg-grad-3" id="alert-glow"></div>
 
             <div class="content-header">
-                <h1 id="view-title" data-i18n="nav_dashboard">Dashboard</h1>
+                <div class="header-title-row">
+                    <div>
+                        <h1 id="view-title" data-i18n="nav_dashboard">Dashboard</h1>
+                        <p class="view-subtitle" id="view-subtitle-text">Real-time enterprise network observability</p>
+                    </div>
+                    <div class="header-quick-stats" id="header-time-stat">
+                        <i class="fa-regular fa-clock"></i> <span id="clock-display">18:40:00</span>
+                    </div>
+                </div>
             </div>
 
+            <!-- Content Area holding SPA Views -->
             <div class="content-area">
                 
-                <!-- Dashboard View -->
+                <!-- 1. DASHBOARD VIEW -->
                 <div id="view-dashboard" class="view active">
+                    <!-- Live KPI Cards -->
                     <div class="stats-grid">
                         <div class="stat-card glass-panel">
-                            <div class="stat-icon icon-blue"></div>
+                            <div class="stat-icon icon-blue"><i class="fa-solid fa-cubes"></i></div>
                             <h3 data-i18n="stat_packets">Captured Packets</h3>
                             <div class="stat-value" id="val-packets">0</div>
+                            <div class="stat-trend text-green"><i class="fa-solid fa-arrow-trend-up"></i> +4.2k / sec</div>
                         </div>
                         <div class="stat-card glass-panel">
-                            <div class="stat-icon icon-purple"></div>
+                            <div class="stat-icon icon-purple"><i class="fa-solid fa-gauge-high"></i></div>
                             <h3 data-i18n="stat_bandwidth">Bandwidth (Mbps)</h3>
                             <div class="stat-value" id="val-bandwidth">0.0</div>
+                            <div class="stat-trend text-blue"><i class="fa-solid fa-network-wired"></i> Avg: 45.2 Mbps</div>
                         </div>
                         <div class="stat-card glass-panel">
-                            <div class="stat-icon icon-green"></div>
-                            <h3 data-i18n="stat_active">Active IPs</h3>
+                            <div class="stat-icon icon-green"><i class="fa-solid fa-circle-nodes"></i></div>
+                            <h3 data-i18n="stat_active">Active Devices</h3>
                             <div class="stat-value" id="val-active-ips">0</div>
+                            <div class="stat-trend text-green"><i class="fa-solid fa-check-double"></i> All systems operational</div>
                         </div>
-                        <div class="stat-card glass-panel alert-card">
-                            <div class="stat-icon icon-red"></div>
+                        <div class="stat-card glass-panel alert-card" id="kpi-dropped-card">
+                            <div class="stat-icon icon-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
                             <h3 data-i18n="stat_dropped">Dropped (Anomalies)</h3>
                             <div class="stat-value text-red" id="val-dropped">0</div>
+                            <div class="stat-trend text-red" id="kpi-dropped-trend"><i class="fa-solid fa-shield-virus"></i> Threat score: low</div>
                         </div>
                     </div>
 
-                    <div class="dashboard-panels">
+                    <!-- Middle Charts & Gauges -->
+                    <div class="dashboard-grid-2">
+                        <!-- Traffic Line Chart -->
                         <div class="glass-panel">
-                            <h3 data-i18n="panel_top_ips" class="panel-title">Top Active IPs</h3>
+                            <div class="panel-header-action">
+                                <h3 data-i18n="panel_bandwidth_chart" class="panel-title-inline"><i class="fa-solid fa-chart-area"></i> Traffic & Bandwidth Analysis</h3>
+                                <span class="badge badge-pulse">LIVE</span>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="dashboard-traffic-chart"></canvas>
+                            </div>
+                        </div>
+                        <!-- System Health Gauges -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-server"></i> System Health & Device Metrics</h3>
+                            <div class="health-gauges-grid">
+                                <div class="gauge-item">
+                                    <span class="gauge-label">CPU Usage</span>
+                                    <div class="gauge-circle-outer">
+                                        <div class="gauge-circle-inner" id="gauge-cpu-val">12%</div>
+                                        <svg class="gauge-svg">
+                                            <circle cx="50" cy="50" r="40" class="gauge-bg-circle"></circle>
+                                            <circle cx="50" cy="50" r="40" class="gauge-fill-circle" id="gauge-cpu-fill" style="stroke-dashoffset: 220;"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="gauge-item">
+                                    <span class="gauge-label">RAM Usage</span>
+                                    <div class="gauge-circle-outer">
+                                        <div class="gauge-circle-inner" id="gauge-ram-val">42%</div>
+                                        <svg class="gauge-svg">
+                                            <circle cx="50" cy="50" r="40" class="gauge-bg-circle"></circle>
+                                            <circle cx="50" cy="50" r="40" class="gauge-fill-circle" id="gauge-ram-fill" style="stroke-dashoffset: 145;"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="gauge-item">
+                                    <span class="gauge-label">Disk Storage</span>
+                                    <div class="gauge-circle-outer">
+                                        <div class="gauge-circle-inner" id="gauge-disk-val">28%</div>
+                                        <svg class="gauge-svg">
+                                            <circle cx="50" cy="50" r="40" class="gauge-bg-circle"></circle>
+                                            <circle cx="50" cy="50" r="40" class="gauge-fill-circle" id="gauge-disk-fill" style="stroke-dashoffset: 180;"></circle>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Fan and Sensor health parameters -->
+                            <div class="sensor-stats-list">
+                                <div class="sensor-row">
+                                    <span><i class="fa-solid fa-fan"></i> Fan Speed</span>
+                                    <span class="sensor-value" id="val-sensor-fan">2400 RPM</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span><i class="fa-solid fa-temperature-half"></i> Core Temp</span>
+                                    <span class="sensor-value" id="val-sensor-temp">38.5 °C</span>
+                                </div>
+                                <div class="sensor-row">
+                                    <span><i class="fa-solid fa-plug"></i> Power Supply Unit</span>
+                                    <span class="sensor-value text-green" id="val-sensor-power">OK (Redundant Active)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Panels: IP Tables and Protocols -->
+                    <div class="dashboard-grid-2 mt-6">
+                        <!-- Top IPs Table -->
+                        <div class="glass-panel">
+                            <h3 data-i18n="panel_top_ips" class="panel-title"><i class="fa-solid fa-list-ol"></i> Top Active IPs</h3>
                             <div class="table-container">
                                 <table id="top-ips-table">
                                     <thead>
                                         <tr>
                                             <th>IP Address</th>
-                                            <th>Bytes</th>
+                                            <th>Sent/Recv</th>
+                                            <th>Protocol</th>
+                                            <th>Usage Bar</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Populated via JS -->
+                                        <!-- Dynamic rows -->
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <!-- TLS Domains & Protocol Breakdown -->
                         <div class="glass-panel">
-                            <h3 data-i18n="panel_tls" class="panel-title">TLS Domains</h3>
-                            <div class="table-container">
-                                <table id="tls-domains-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Domain</th>
-                                            <th>Hits</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Populated via JS -->
-                                    </tbody>
-                                </table>
+                            <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> Protocol Breakdown & TLS Hits</h3>
+                            <div class="chart-wrapper-small">
+                                <canvas id="dashboard-protocol-chart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Map View -->
+                <!-- 2. NETWORK TOPOLOGY & MAP VIEW -->
                 <div id="view-map" class="view hidden">
-                    <div class="glass-panel h-full flex-center relative overflow-hidden">
-                        <div class="world-map-bg"></div>
-                        <h2 data-i18n="map_placeholder" class="z-10 text-2xl font-semibold mb-2">Live Geo-Location Tracking Active...</h2>
-                        <p class="text-muted z-10" data-i18n="map_desc">C++ GeoIPLite database is simulating connections across the globe.</p>
-                        <div class="radar-animation z-10"></div>
+                    <!-- Tab Selector for Topology / Heatmap / World map -->
+                    <div class="view-sub-tabs mb-4">
+                        <button class="sub-tab-btn active" data-subview="topo"><i class="fa-solid fa-diagram-project"></i> Interactive Topology</button>
+                        <button class="sub-tab-btn" data-subview="wifi"><i class="fa-solid fa-wifi"></i> Wi-Fi Heatmap</button>
+                        <button class="sub-tab-btn" data-subview="world"><i class="fa-solid fa-earth-americas"></i> Branch Locations</button>
+                    </div>
+
+                    <!-- Topology Area -->
+                    <div id="subview-topo" class="sub-view-content active">
+                        <div class="glass-panel relative flex-column h-full">
+                            <div class="map-controls">
+                                <button class="btn-icon" onclick="resetTopoZoom()" title="Reset Zoom"><i class="fa-solid fa-compress"></i></button>
+                                <button class="btn-icon" onclick="triggerAutoDiscovery()" title="Auto Discovery"><i class="fa-solid fa-magnifying-glass-location"></i> Discover</button>
+                                <span class="map-legend"><span class="dot green"></span> Router <span class="dot blue"></span> Switch <span class="dot purple"></span> Server <span class="dot red"></span> Firewall</span>
+                            </div>
+                            <div class="topology-canvas-container">
+                                <canvas id="network-topology-canvas"></canvas>
+                            </div>
+                            <div class="topology-details-panel hidden" id="node-details-card">
+                                <div class="details-header">
+                                    <h4 id="node-name">Core_Router_01</h4>
+                                    <button class="btn-close" onclick="closeNodeDetails()">&times;</button>
+                                </div>
+                                <div class="details-body">
+                                    <p><strong>Type:</strong> <span id="node-type">Router</span></p>
+                                    <p><strong>IP:</strong> <span id="node-ip">10.0.0.1</span></p>
+                                    <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                                    <p><strong>Load (CPU/RAM):</strong> <span id="node-load">12% / 32%</span></p>
+                                    <p><strong>Ping/Loss:</strong> <span id="node-ping">4ms / 0%</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wi-Fi Heatmap Area -->
+                    <div id="subview-wifi" class="sub-view-content hidden">
+                        <div class="glass-panel h-full relative">
+                            <h3 class="panel-title"><i class="fa-solid fa-wifi"></i> Wi-Fi Signal Coverage (Office Floorplan HQ)</h3>
+                            <div class="heatmap-canvas-container">
+                                <div class="office-floorplan-bg">
+                                    <!-- Render heatmap canvas over it -->
+                                    <canvas id="wifi-heatmap-canvas"></canvas>
+                                </div>
+                            </div>
+                            <div class="heatmap-legend">
+                                <span>Weak Signal (-85dBm)</span>
+                                <div class="gradient-strip"></div>
+                                <span>Excellent Signal (-35dBm)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- World Branch Map Area -->
+                    <div id="subview-world" class="sub-view-content hidden">
+                        <div class="glass-panel h-full flex-center relative overflow-hidden">
+                            <div class="world-map-bg"></div>
+                            <!-- Pulse markers on top of map container -->
+                            <div class="pulse-marker" style="top: 36%; left: 28%;" data-branch="San Francisco HQ">
+                                <div class="pulse-dot"></div>
+                                <span class="marker-label">SF HQ (Active)</span>
+                            </div>
+                            <div class="pulse-marker" style="top: 32%; left: 49%;" data-branch="Dublin Office">
+                                <div class="pulse-dot"></div>
+                                <span class="marker-label">Dublin Hub (Active)</span>
+                            </div>
+                            <div class="pulse-marker" style="top: 38%; left: 56%;" data-branch="Istanbul Office">
+                                <div class="pulse-dot"></div>
+                                <span class="marker-label">Istanbul Branch (Active)</span>
+                            </div>
+                            <div class="pulse-marker" style="top: 41%; left: 81%;" data-branch="Tokyo Office">
+                                <div class="pulse-dot"></div>
+                                <span class="marker-label">Tokyo Lab (Standby)</span>
+                            </div>
+                            
+                            <div class="branch-connections-summary z-10">
+                                <h3><i class="fa-solid fa-globe"></i> Global Branch Connectivity (MPLS / SD-WAN)</h3>
+                                <p>VPN tunnels status: <strong>4/4 UP</strong> &middot; Latency: <strong>68ms avg</strong> &middot; IPFIX streaming active</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Rules Manager View -->
-                <div id="view-rules" class="view hidden">
-                    <div class="dashboard-panels">
+                <!-- 3. MONITORING SUITE (ICMP, TCP, SNMP, NetFlow) -->
+                <div id="view-monitoring" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- ICMP Ping & TCP Port Scan -->
                         <div class="glass-panel">
-                            <h3 data-i18n="rules_add_title" class="panel-title">Add Custom Rule</h3>
-                            <div class="form-group">
-                                <label data-i18n="lbl_rule_name">Rule Name</label>
-                                <input type="text" id="rule-name" class="input-field" placeholder="e.g. Block Port 22">
+                            <h3 class="panel-title"><i class="fa-solid fa-heartbeat"></i> ICMP Ping & Port Monitoring</h3>
+                            <div class="form-row mb-4">
+                                <input type="text" id="monitoring-ip-input" class="input-field-small" placeholder="IP Address (e.g. 8.8.8.8)">
+                                <button class="btn-primary-small" onclick="addNewPingTarget()"><i class="fa-solid fa-plus"></i> Add Target</button>
                             </div>
-                            <div class="form-group">
-                                <label data-i18n="lbl_rule_condition">Condition (BPF syntax)</label>
-                                <input type="text" id="rule-condition" class="input-field" placeholder="e.g. tcp dst port 22">
-                            </div>
-                            <button class="btn-primary" onclick="addRule()" data-i18n="btn_add_rule">Add Rule</button>
-                        </div>
-                        <div class="glass-panel">
-                            <h3 data-i18n="rules_active_title" class="panel-title">Active Rules</h3>
-                            <div class="table-container">
-                                <table id="rules-table">
+                            <div class="table-container-fixed">
+                                <table id="ping-monitoring-table">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Condition</th>
+                                            <th>Target</th>
+                                            <th>Latency</th>
+                                            <th>Loss</th>
+                                            <th>Jitter</th>
+                                            <th>Port Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="rules-tbody">
+                                    <tbody>
+                                        <!-- Filled by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- SNMP & Bandwidth details -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-network-wired"></i> SNMP Interface Monitoring</h3>
+                            <div class="table-container-fixed">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td>Default Block</td>
-                                            <td class="font-mono">ip and not host 10.0.0.5</td>
-                                            <td><button class="btn-delete" disabled>Locked</button></td>
+                                            <th>Interface</th>
+                                            <th>Type</th>
+                                            <th>Admin Status</th>
+                                            <th>Speed</th>
+                                            <th>In (bps)</th>
+                                            <th>Out (bps)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>GigabitEthernet0/1</td>
+                                            <td>WAN (Fiber)</td>
+                                            <td><span class="badge badge-success">UP</span></td>
+                                            <td>1.0 Gbps</td>
+                                            <td>42.5 Mbps</td>
+                                            <td>18.4 Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>GigabitEthernet0/2</td>
+                                            <td>LAN Uplink</td>
+                                            <td><span class="badge badge-success">UP</span></td>
+                                            <td>10 Gbps</td>
+                                            <td>240 Mbps</td>
+                                            <td>195 Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vlan100</td>
+                                            <td>Corporate LAN</td>
+                                            <td><span class="badge badge-success">UP</span></td>
+                                            <td>1.0 Gbps</td>
+                                            <td>18.2 Mbps</td>
+                                            <td>12.4 Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vlan200</td>
+                                            <td>Guest WiFi</td>
+                                            <td><span class="badge badge-warning">LIMIT</span></td>
+                                            <td>100 Mbps</td>
+                                            <td>85.4 Mbps</td>
+                                            <td>5.2 Mbps</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tunnel10 (IPsec)</td>
+                                            <td>VPN Cloud</td>
+                                            <td><span class="badge badge-success">UP</span></td>
+                                            <td>500 Mbps</td>
+                                            <td>14.1 Mbps</td>
+                                            <td>28.5 Mbps</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Export Manager View -->
-                <div id="view-export" class="view hidden">
-                    <div class="glass-panel max-w-md mx-auto">
-                        <h3 data-i18n="export_title" class="panel-title">Export PCAP & Metrics</h3>
-                        <p class="text-muted mb-6" data-i18n="export_desc">Download captured packets and statistical data for offline analysis.</p>
-                        
-                        <div class="export-options">
-                            <button class="btn-primary w-full mb-4 export-btn" onclick="simulateExport(this)" data-i18n="btn_export_pcap">Export as .PCAP</button>
-                            <button class="btn-secondary w-full mb-4 export-btn" onclick="simulateExport(this)" data-i18n="btn_export_csv">Export Metrics (CSV)</button>
-                            <button class="btn-secondary w-full export-btn" onclick="simulateExport(this)" data-i18n="btn_export_json">Export Data (JSON)</button>
-                        </div>
-                        <div class="export-progress hidden mt-6" id="export-progress">
-                            <div class="progress-bar-container">
-                                <div class="progress-bar-fill" id="export-fill"></div>
-                            </div>
-                            <p class="text-center mt-2 text-sm text-muted" id="export-status">Exporting...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Architecture Guide View -->
-                <div id="view-architecture" class="view hidden">
-                    <div class="glass-panel">
-                        <h3 data-i18n="arch_title" class="panel-title">System Architecture</h3>
-                        <p class="text-muted mb-6" data-i18n="arch_desc">A high-level overview of the NetVision C++ components and data flow.</p>
-                        
-                        <div class="arch-diagram">
-                            <div class="arch-box">Network Interface (eth0)</div>
-                            <div class="arch-arrow">↓</div>
-                            <div class="arch-box highlight">PacketParser.cpp (BPF Filtering)</div>
-                            <div class="arch-arrow">↓</div>
-                            <div class="arch-flex">
-                                <div class="arch-box">GeoIPLite.cpp</div>
-                                <div class="arch-box">NetworkAnalyzer.cpp</div>
-                            </div>
-                            <div class="arch-arrow">↓</div>
-                            <div class="arch-box highlight">Vanilla JS Frontend (WebSocket Simulation)</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Alerts View -->
-                <div id="view-alerts" class="view hidden">
-                    <div class="glass-panel">
-                        <h3 data-i18n="panel_alerts" class="panel-title">Security Alerts</h3>
-                        <div id="alerts-container" class="alerts-list">
-                            <!-- Populated via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Logs View -->
-                <div id="view-logs" class="view hidden">
-                    <div class="glass-panel terminal-panel">
-                        <div class="terminal-header">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                            <span class="terminal-title">netvision-daemon.log</span>
-                        </div>
-                        <div class="terminal-content" id="logs-container">
-                            <!-- Populated via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings View -->
-                <div id="view-settings" class="view hidden">
-                    <div class="glass-panel max-w-md mx-auto">
-                        <h3 data-i18n="settings_title" class="panel-title">Daemon Configuration</h3>
-                        <p class="text-muted mb-6" data-i18n="settings_desc">Configure the C++ backend daemon parameters.</p>
-                        
-                        <div class="form-group">
-                            <label data-i18n="lbl_interface">Network Interface</label>
-                            <input type="text" value="eth0" class="input-field" disabled>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="lbl_bpf">BPF Filter</label>
-                            <input type="text" value="ip and not host 10.0.0.5" class="input-field">
-                        </div>
-
-                        <div class="form-group">
-                            <label data-i18n="lbl_loglevel">Log Level</label>
-                            <select class="input-field">
-                                <option>DEBUG</option>
-                                <option selected>INFO</option>
-                                <option>WARN</option>
-                                <option>ERROR</option>
+                    <!-- Advanced Flow Analyzers -->
+                    <div class="glass-panel mt-6">
+                        <div class="panel-header-action">
+                            <h3 class="panel-title-inline"><i class="fa-solid fa-code-fork"></i> NetFlow / sFlow / IPFIX Real-Time Collector</h3>
+                            <select class="input-field-small" style="width: auto;">
+                                <option>Protocol: NetFlow v9</option>
+                                <option>Protocol: sFlow v5</option>
+                                <option>Protocol: IPFIX</option>
                             </select>
                         </div>
+                        <div class="table-container">
+                            <table id="flow-collector-table">
+                                <thead>
+                                    <tr>
+                                        <th>Source IP</th>
+                                        <th>Source Port</th>
+                                        <th>Destination IP</th>
+                                        <th>Destination Port</th>
+                                        <th>Protocol</th>
+                                        <th>Bytes Count</th>
+                                        <th>QoS Class</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated in app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                        <button class="btn-primary mt-6 w-full" onclick="alert('Configuration saved directly to daemon.')" data-i18n="btn_save">Save Config</button>
+                <!-- 4. SECURITY CENTER (IDS, IPS, CVE, Risk Assessment) -->
+                <div id="view-security" class="view hidden">
+                    <!-- Top stats summary for security -->
+                    <div class="security-stats-row mb-6">
+                        <div class="sec-stat-box glass-panel">
+                            <span>Threat Intelligence Feed</span>
+                            <strong class="text-green"><i class="fa-solid fa-check"></i> Connected & Synchronized</strong>
+                        </div>
+                        <div class="sec-stat-box glass-panel">
+                            <span>Vulnerabilities Tracked (CVE)</span>
+                            <strong class="text-yellow">8 Open (Medium)</strong>
+                        </div>
+                        <div class="sec-stat-box glass-panel">
+                            <span>Firewall Rules Blocks</span>
+                            <strong class="text-red">1,482 (24h)</strong>
+                        </div>
+                        <div class="sec-stat-box glass-panel">
+                            <span>IPS Active Blocks</span>
+                            <strong class="text-blue">4 Active Rules</strong>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid-2">
+                        <!-- Intrusion Detection/Prevention Alerts (IDS/IPS) -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-shield-halved"></i> Live Intrusion Detection (IDS/IPS) Logs</h3>
+                            <div class="alerts-list" id="security-ids-logs">
+                                <!-- Populated in app.js -->
+                            </div>
+                        </div>
+
+                        <!-- Vulnerability CVE management & Risk Panel -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-bug"></i> Vulnerability Management & CVE Tracking</h3>
+                            <div class="table-container-fixed">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>CVE ID</th>
+                                            <th>Severity</th>
+                                            <th>Description</th>
+                                            <th>Risk Score</th>
+                                            <th>Patch Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CVE-2026-0012</td>
+                                            <td><span class="badge badge-danger">CRITICAL</span></td>
+                                            <td>BGP router buffer overflow...</td>
+                                            <td>9.8</td>
+                                            <td><span class="badge badge-warning">AVAILABLE</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>CVE-2026-0814</td>
+                                            <td><span class="badge badge-warning">HIGH</span></td>
+                                            <td>OpenSSH Denial of Service...</td>
+                                            <td>8.2</td>
+                                            <td><span class="badge badge-success">APPLIED</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>CVE-2025-4921</td>
+                                            <td><span class="badge badge-info">MEDIUM</span></td>
+                                            <td>SSL Certificate validation bypass...</td>
+                                            <td>5.4</td>
+                                            <td><span class="badge badge-warning">SCHED</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>CVE-2025-1029</td>
+                                            <td><span class="badge badge-info">LOW</span></td>
+                                            <td>DNS Server information disclosure...</td>
+                                            <td>3.2</td>
+                                            <td><span class="badge badge-success">APPLIED</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Overall Risk analysis panel -->
+                            <div class="risk-meter-box mt-6">
+                                <h4>Risk Analysis Panel</h4>
+                                <div class="risk-bar-container">
+                                    <div class="risk-bar-fill" style="width: 28%; background: linear-gradient(90deg, #10b981, #facc15);"></div>
+                                    <span class="risk-bar-label">Current Risk Index: 28/100 (Low Risk)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. ANALYTICS & MONITORING CHARTS -->
+                <div id="view-analytics" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- Traffic forecast and analytical breakdown -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-chart-line"></i> Bandwidth & Capacity Forecasting (7 Days)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="analytics-forecast-chart"></canvas>
+                            </div>
+                            <p class="text-muted text-sm mt-2"><i class="fa-solid fa-brain"></i> AI Engine Prediction: Network bandwidth is projected to peak next Wednesday due to planned DB synchronization.</p>
+                        </div>
+                        
+                        <!-- Packet Latency Distribution Histogram -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-wave-square"></i> Latency Histogram / Jitter Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="analytics-latency-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. REPORTS EXPORTER & SLA -->
+                <div id="view-reports" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- Generate Report -->
+                        <div class="glass-panel">
+                            <h3 data-i18n="export_title" class="panel-title"><i class="fa-solid fa-file-pdf"></i> Generate Network Analytics Report</h3>
+                            <p class="text-muted mb-4" data-i18n="export_desc">Download captured packets and statistical metrics for offline verification and executive reviews.</p>
+                            
+                            <div class="form-group">
+                                <label>Report Target</label>
+                                <select class="input-field" id="report-target-select">
+                                    <option>Executive Summary (Yönetici Özeti)</option>
+                                    <option>SLA Performance Report</option>
+                                    <option>Security Threat Assessment</option>
+                                    <option>Bandwidth Capacity Forecast</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Date Interval</label>
+                                <select class="input-field">
+                                    <option>Last 24 Hours</option>
+                                    <option>Last 7 Days</option>
+                                    <option>Last 30 Days</option>
+                                    <option>Custom Range</option>
+                                </select>
+                            </div>
+
+                            <div class="export-options">
+                                <button class="btn-primary w-full mb-4 export-btn" onclick="triggerReportExport('PDF')"><i class="fa-solid fa-file-pdf"></i> Export as PDF Report</button>
+                                <button class="btn-secondary w-full mb-4 export-btn" onclick="triggerReportExport('Excel')"><i class="fa-solid fa-file-excel"></i> Export Metrics as Excel</button>
+                                <button class="btn-secondary w-full export-btn" onclick="triggerReportExport('CSV')"><i class="fa-solid fa-file-csv"></i> Export Flows as CSV</button>
+                            </div>
+
+                            <div class="export-progress hidden mt-6" id="export-progress">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="export-fill"></div>
+                                </div>
+                                <p class="text-center mt-2 text-sm text-muted" id="export-status">Preparing document...</p>
+                            </div>
+                        </div>
+
+                        <!-- SLA (Service Level Agreement) Performance -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-file-shield"></i> Network SLA Compliance Overview</h3>
+                            
+                            <div class="sla-progress-box">
+                                <div class="sla-item">
+                                    <div class="sla-header">
+                                        <span>ISP WAN Uptime Uptime SLA (Target: 99.99%)</span>
+                                        <strong>99.995%</strong>
+                                    </div>
+                                    <div class="sla-bar"><div class="sla-bar-fill bg-green" style="width: 100%;"></div></div>
+                                </div>
+
+                                <div class="sla-item">
+                                    <div class="sla-header">
+                                        <span>Corporate Wi-Fi Availability (Target: 99.90%)</span>
+                                        <strong>99.921%</strong>
+                                    </div>
+                                    <div class="sla-bar"><div class="sla-bar-fill bg-green" style="width: 100%;"></div></div>
+                                </div>
+
+                                <div class="sla-item">
+                                    <div class="sla-header">
+                                        <span>VPN Gateway Gateway Tunnel Uptime (Target: 99.5%)</span>
+                                        <strong>99.814%</strong>
+                                    </div>
+                                    <div class="sla-bar"><div class="sla-bar-fill bg-green" style="width: 100%;"></div></div>
+                                </div>
+
+                                <div class="sla-item">
+                                    <div class="sla-header">
+                                        <span>Packet Latency Target SLA (&lt; 20ms)</span>
+                                        <strong class="text-yellow">18.52ms (Warning boundary)</strong>
+                                    </div>
+                                    <div class="sla-bar"><div class="sla-bar-fill bg-yellow" style="width: 90%;"></div></div>
+                                </div>
+                            </div>
+
+                            <!-- Scheduled reports config -->
+                            <div class="scheduled-reports-config mt-6">
+                                <h4>Automatic Scheduled Reports</h4>
+                                <div class="form-row">
+                                    <span class="text-sm text-muted">Weekly Executive PDF Summary to exec@company.local</span>
+                                    <button class="btn-secondary-small">Modify</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. AI ASSISTANT CHAT & PREDICTION -->
+                <div id="view-ai-assistant" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- AI Assistant Chat window -->
+                        <div class="glass-panel flex-column h-full">
+                            <h3 class="panel-title"><i class="fa-solid fa-brain"></i> NetVision AI Assistant (Network Operations)</h3>
+                            <div class="ai-chat-messages" id="ai-chat-box">
+                                <div class="chat-msg system">
+                                    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                                    <div class="msg-text">
+                                        Hello! I am your NetVision AI Network Assistant. I monitor traffic patterns, predict potential anomalies, and perform root-cause analysis. Ask me anything, e.g.:
+                                        <ul>
+                                            <li>"Perform root cause analysis on current latency"</li>
+                                            <li>"Estimate next week's traffic volume"</li>
+                                            <li>"Do we have any active port scanning?"</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ai-chat-input-row">
+                                <input type="text" id="ai-input" class="input-field" placeholder="Ask AI Assistant..." onkeydown="handleAiInputKey(event)">
+                                <button class="btn-primary" onclick="submitAiQuery()"><i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Predictive maintenance & Problem prediction panel -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-crystal-ball"></i> AI Network Predictive Maintenance</h3>
+                            <div class="predictive-metrics-list">
+                                <div class="predictive-card bg-gradient-panel border-green">
+                                    <div class="pred-title">
+                                        <strong>Hard Drive Exhaustion Forecast</strong>
+                                        <span class="badge badge-success">No Risk</span>
+                                    </div>
+                                    <p>Based on current logs, Server_Rack_03 storage will reach 80% capacity in <strong>42 days</strong>. Maintenance scheduled.</p>
+                                </div>
+
+                                <div class="predictive-card bg-gradient-panel border-yellow">
+                                    <div class="pred-title">
+                                        <strong>Switch Port Bandwidth Congestion</strong>
+                                        <span class="badge badge-warning">High Probability</span>
+                                    </div>
+                                    <p>AI predicts GigabitEthernet0/2 uplink will bottleneck (95% load) in <strong>14 hours</strong> based on historical weekly patterns.</p>
+                                </div>
+
+                                <div class="predictive-card bg-gradient-panel border-red">
+                                    <div class="pred-title">
+                                        <strong>SLA Breaching Risk Alert</strong>
+                                        <span class="badge badge-danger">Urgent Action</span>
+                                    </div>
+                                    <p>Calculated packet loss is increasing at a rate of 0.05%/hour. Estimated SLA breach (0.5% loss threshold) in <strong>3.5 hours</strong> unless routing path is optimized.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. USER MANAGEMENT & RBAC -->
+                <div id="view-users" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- User list and role controller -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-users"></i> Platform User Directory & RBAC Policies</h3>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                            <th>AD / SSO Link</th>
+                                            <th>MFA Status</th>
+                                            <th>Permissions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Admin User</td>
+                                            <td><span class="badge badge-danger">Administrator</span></td>
+                                            <td>ActiveDirectory</td>
+                                            <td><span class="badge badge-success">ON</span></td>
+                                            <td>Full Access</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ops Engineer</td>
+                                            <td><span class="badge badge-warning">Operator</span></td>
+                                            <td>ActiveDirectory</td>
+                                            <td><span class="badge badge-success">ON</span></td>
+                                            <td>Write/Modify Rules</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Auditor Guest</td>
+                                            <td><span class="badge badge-info">Read-Only</span></td>
+                                            <td>SSO Login</td>
+                                            <td><span class="badge badge-danger">OFF</span></td>
+                                            <td>View Dashboard</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <h4 class="mt-6 mb-2">LDAP / Active Directory Integration</h4>
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label>Domain Controller URL</label>
+                                    <input type="text" value="ldap://ad.company.local" class="input-field" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sync Status</label>
+                                    <span class="badge badge-success" style="display:inline-block; margin-top:12px;">Active Sync</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Security audit log -->
+                        <div class="glass-panel terminal-panel">
+                            <div class="terminal-header">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                                <span class="terminal-title">audit-trail.log</span>
+                            </div>
+                            <div class="terminal-content" id="audit-logs-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. SETTINGS & ALERTS CONFIG -->
+                <div id="view-settings" class="view hidden">
+                    <div class="dashboard-grid-2">
+                        <!-- C++ Server Configuration -->
+                        <div class="glass-panel">
+                            <h3 data-i18n="settings_title" class="panel-title"><i class="fa-solid fa-cogs"></i> Daemon Configuration</h3>
+                            <p class="text-muted mb-6" data-i18n="settings_desc">Configure the high-performance C++ backend daemon connection parameters.</p>
+                            
+                            <div class="form-group">
+                                <label>Daemon Connection Mode</label>
+                                <select class="input-field" id="settings-daemon-mode-select">
+                                    <option value="sim">Simulate Data (GitHub Pages mode)</option>
+                                    <option value="live">Live WebSocket Daemon (ws://localhost:8085)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-i18n="lbl_interface">Network Interface</label>
+                                <input type="text" id="settings-interface-input" value="en0" class="input-field">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label data-i18n="lbl_bpf">BPF Sniffer Filter</label>
+                                <input type="text" id="settings-bpf-input" value="ip and not port 8085" class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label data-i18n="lbl_loglevel">Daemon Log Level</label>
+                                <select class="input-field">
+                                    <option>DEBUG</option>
+                                    <option selected>INFO</option>
+                                    <option>WARN</option>
+                                    <option>ERROR</option>
+                                </select>
+                            </div>
+
+                            <button class="btn-primary mt-6 w-full" onclick="saveDaemonSettings()" data-i18n="btn_save">Save & Apply Config</button>
+                        </div>
+
+                        <!-- Notification Webhooks configuration -->
+                        <div class="glass-panel">
+                            <h3 class="panel-title"><i class="fa-solid fa-bell"></i> Alarm & Integration Webhooks</h3>
+                            <p class="text-muted mb-6">Forward high priority network anomalies instantly to team collaboration platforms.</p>
+                            
+                            <div class="form-group">
+                                <label><i class="fa-brands fa-slack"></i> Slack Webhook URL</label>
+                                <input type="text" placeholder="https://hooks.slack.com/services/..." class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-brands fa-discord"></i> Discord Webhook Channel URL</label>
+                                <input type="text" placeholder="https://discord.com/api/webhooks/..." class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-brands fa-telegram"></i> Telegram Bot Notification API</label>
+                                <input type="text" placeholder="botTOKEN/chat_id" class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-brands fa-whatsapp"></i> WhatsApp Business API Link</label>
+                                <input type="text" placeholder="+1234567890" class="input-field">
+                            </div>
+
+                            <button class="btn-secondary w-full" onclick="alert('Notification triggers updated successfully.')">Test Webhook Targets</button>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </main>
 
-        <!-- Playback Bar -->
+        <!-- Playback Timeline / Log streaming Panel -->
         <footer class="playback-bar">
             <div class="playback-controls">
-                <button class="playback-btn" id="pb-rewind">⏮</button>
-                <button class="playback-btn" id="pb-play">⏸</button>
-                <button class="playback-btn" id="pb-forward">⏭</button>
+                <button class="playback-btn" id="pb-rewind" title="Rewind Logs"><i class="fa-solid fa-backward-step"></i></button>
+                <button class="playback-btn" id="pb-play" title="Pause Streaming"><i class="fa-solid fa-pause"></i></button>
+                <button class="playback-btn" id="pb-forward" title="Fast Forward Logs"><i class="fa-solid fa-forward-step"></i></button>
             </div>
             <div class="timeline-container">
                 <span class="timeline-time" id="time-start">10:00:00</span>
@@ -276,11 +830,12 @@
                 <span class="timeline-time" id="time-current">Live</span>
             </div>
             <div class="playback-status">
-                <span data-i18n="pb_live" class="live-badge">LIVE</span>
+                <span data-i18n="pb_live" class="live-badge">LIVE STREAM</span>
             </div>
         </footer>
 
     </div>
+    <!-- Load SPA app script -->
     <script src="app.js"></script>
 </body>
 </html>
