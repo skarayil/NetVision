@@ -21,7 +21,7 @@
 
 <br/>
 
-### 🌐 [Canlı Demo → GitHub Pages](https://your-username.github.io/netvision/)
+### 🌐 [Canlı Demo → NetVision](https://skarayil.github.io/NetVision/)
 
 <br/>
 
